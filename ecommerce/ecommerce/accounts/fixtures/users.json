@@ -1,0 +1,74 @@
+[
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$newuserpasswordhashhere",
+      "last_login": null,
+      "is_superuser": true,
+      "username": "admin",
+      "first_name": "Admin",
+      "last_name": "User",
+      "email": "admin@shopmart.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-06-01T00:00:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$newuserpasswordhashhere",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "johndoe",
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-06-05T00:00:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$newuserpasswordhashhere",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "janedoe",
+      "first_name": "Jane",
+      "last_name": "Doe",
+      "email": "jane@example.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2026-06-06T00:00:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 4,
+    "fields": {
+      "password": "pbkdf2_sha256$870000$newuserpasswordhashhere",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "staffuser",
+      "first_name": "Staff",
+      "last_name": "Member",
+      "email": "staff@shopmart.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2026-06-07T00:00:00Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  }
+]

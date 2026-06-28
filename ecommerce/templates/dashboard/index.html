@@ -1,0 +1,225 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+    <h1 class="h3">Dashboard</h1>
+    <small class="text-muted">Last updated: {% now "F j, Y, g:i a" %}</small>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card shadow-sm bg-primary text-white">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-white bg-opacity-25">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div>
+                    <h6 class="card-title mb-0 fs-6 fw-normal">Total Products</h6>
+                    <span class="fs-3 fw-bold">{{ total_products }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card shadow-sm bg-success text-white">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-white bg-opacity-25">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div>
+                    <h6 class="card-title mb-0 fs-6 fw-normal">Total Users</h6>
+                    <span class="fs-3 fw-bold">{{ total_users }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card shadow-sm bg-warning text-white">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-white bg-opacity-25">
+                    <i class="bi bi-cart-check"></i>
+                </div>
+                <div>
+                    <h6 class="card-title mb-0 fs-6 fw-normal">Total Orders</h6>
+                    <span class="fs-3 fw-bold">{{ total_orders }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-3">
+        <div class="card stat-card shadow-sm bg-info text-white">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-white bg-opacity-25">
+                    <i class="bi bi-currency-dollar"></i>
+                </div>
+                <div>
+                    <h6 class="card-title mb-0 fs-6 fw-normal">Revenue</h6>
+                    <span class="fs-3 fw-bold">${{ revenue|floatformat:2 }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Orders per Month</h5>
+                <span class="badge bg-secondary">{{ months|length }} months</span>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="ordersChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Order Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height: 240px;">
+                    <canvas id="statusChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Revenue per Month</h5>
+                <span class="badge bg-secondary">{{ rev_months|length }} months</span>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Recent Orders</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    {% for order in recent_orders %}
+                        <div class="list-group-item">
+                            <div class="d-flex w-100 justify-content-between">
+                                <strong>{{ order.order_number }}</strong>
+                                <small class="text-muted">{{ order.created_at|date:"M d" }}</small>
+                            </div>
+                            <div class="d-flex w-100 justify-content-between mt-1">
+                                <small class="text-muted">{{ order.user.username }}</small>
+                                {% if order.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                {% elif order.status == 'delivered' %}
+                                    <span class="badge bg-success">Delivered</span>
+                                {% elif order.status == 'shipped' %}
+                                    <span class="badge bg-primary">Shipped</span>
+                                {% elif order.status == 'processing' %}
+                                    <span class="badge bg-info">Processing</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="list-group-item text-center text-muted py-3">No orders yet</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var chartColor = '#0d6efd';
+
+    new Chart(document.getElementById('ordersChart'), {
+        type: 'line',
+        data: {
+            labels: {{ months|safe }},
+            datasets: [{
+                label: 'Orders',
+                data: {{ orders_data|safe }},
+                borderColor: chartColor,
+                backgroundColor: chartColor + '20',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ status_labels|safe }},
+            datasets: [{
+                data: {{ status_data|safe }},
+                backgroundColor: [
+                    '{{ status_colors.pending }}',
+                    '{{ status_colors.processing }}',
+                    '{{ status_colors.shipped }}',
+                    '{{ status_colors.delivered }}',
+                    '{{ status_colors.cancelled }}',
+                ],
+                borderWidth: 2,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { boxWidth: 12, padding: 8, font: { size: 11 } }
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('revenueChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ rev_months|safe }},
+            datasets: [{
+                label: 'Revenue ($)',
+                data: {{ rev_data|safe }},
+                backgroundColor: '#198754',
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, ticks: { callback: function (v) { return '$' + v; } } }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

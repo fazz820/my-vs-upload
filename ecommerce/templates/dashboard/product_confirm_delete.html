@@ -1,0 +1,52 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block title %}Delete Product{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+    <h1 class="h3">Delete Product</h1>
+    <a href="{% url 'dashboard:product_list' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left"></i> Back to Products
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-danger">
+            <div class="card-body text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="card-title">Are you sure?</h5>
+                <p class="card-text text-muted">
+                    You are about to delete <strong>"{{ product.name }}"</strong>.
+                    This action cannot be undone.
+                </p>
+
+                {% if product.image %}
+                    <div class="mb-3">
+                        <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-height: 100px;" class="rounded border">
+                    </div>
+                {% endif %}
+
+                <dl class="row small text-start">
+                    <dt class="col-sm-4">Category</dt>
+                    <dd class="col-sm-8">{{ product.category.name }}</dd>
+                    <dt class="col-sm-4">Price</dt>
+                    <dd class="col-sm-8">${{ product.price }}</dd>
+                    <dt class="col-sm-4">Stock</dt>
+                    <dd class="col-sm-8">{{ product.stock }}</dd>
+                </dl>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Yes, Delete Product
+                    </button>
+                    <a href="{% url 'dashboard:product_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

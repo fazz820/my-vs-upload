@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopMart — Premium E-Commerce</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --primary: #2b2d42;
+            --accent: #ef233c;
+            --accent-hover: #d90429;
+            --bg-light: #f8f9fa;
+            --gray-100: #edf2f4;
+            --gray-200: #e9ecef;
+        }
+        body { font-family: system-ui, -apple-system, sans-serif; }
+
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a1b2e 100%);
+            min-height: 92vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(239,35,60,.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,.05) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .hero-content { position: relative; z-index: 1; }
+        .hero h1 { font-size: clamp(2.2rem, 5vw, 4rem); font-weight: 800; line-height: 1.1; }
+        .hero p { font-size: clamp(1rem, 2vw, 1.2rem); opacity: .85; max-width: 540px; }
+        .hero .btn-accent {
+            background: var(--accent);
+            color: #fff;
+            padding: .75rem 2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all .2s;
+            border: none;
+        }
+        .hero .btn-accent:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(239,35,60,.35);
+        }
+        .hero .btn-outline-light { border-radius: 50px; padding: .75rem 2rem; font-weight: 600; }
+        .hero .hero-stats { margin-top: 3rem; }
+        .hero .hero-stats .stat-item { border-right: 1px solid rgba(255,255,255,.15); padding-right: 2rem; margin-right: 2rem; }
+        .hero .hero-stats .stat-item:last-child { border-right: none; }
+        .hero .hero-stats .stat-number { font-size: 1.5rem; font-weight: 700; }
+        .hero .hero-stats .stat-label { font-size: .8rem; opacity: .7; }
+
+        .section-heading { font-weight: 700; color: var(--primary); }
+        .section-subtitle { color: #6c757d; max-width: 540px; }
+
+        .product-card {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform .25s, box-shadow .25s;
+            background: #fff;
+            height: 100%;
+        }
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(0,0,0,.1);
+        }
+        .product-card .img-wrap {
+            height: 240px;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+        .product-card .img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .4s;
+        }
+        .product-card:hover .img-wrap img { transform: scale(1.08); }
+        .product-card .badge-pos { position: absolute; top: 10px; left: 10px; }
+        .product-card .card-body { padding: 1rem; }
+        .product-card .card-title {
+            font-size: .95rem;
+            font-weight: 600;
+            margin-bottom: .25rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .product-card .card-text { font-size: .85rem; }
+        .product-card .price { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+        .product-card .price-old { font-size: .85rem; color: #adb5bd; text-decoration: line-through; }
+        .product-card .btn-add {
+            border-radius: 50px;
+            font-size: .8rem;
+            padding: .35rem 1rem;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            transition: all .2s;
+        }
+        .product-card .btn-add:hover { background: var(--primary); color: #fff; }
+
+        .category-card {
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            height: 260px;
+            display: block;
+            text-decoration: none;
+        }
+        .category-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform .4s;
+        }
+        .category-card:hover img { transform: scale(1.08); }
+        .category-card .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(transparent 40%, rgba(0,0,0,.7));
+        }
+        .category-card .cat-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem 1rem;
+            color: #fff;
+        }
+        .category-card .cat-label h5 { font-weight: 700; margin-bottom: .25rem; }
+        .category-card .cat-label small { opacity: .8; }
+
+        .testimonial-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,.04);
+            height: 100%;
+        }
+        .testimonial-card .stars { color: #ffc107; font-size: .9rem; }
+        .testimonial-card .quote { font-size: .95rem; line-height: 1.6; color: #495057; }
+
+        .newsletter {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a1b2e 100%);
+            border-radius: 20px;
+            padding: 3.5rem 2rem;
+            text-align: center;
+        }
+        .newsletter .input-group { max-width: 480px; margin: 0 auto; }
+        .newsletter .form-control {
+            border-radius: 50px 0 0 50px;
+            border: none;
+            padding: .75rem 1.25rem;
+        }
+        .newsletter .btn-sub {
+            border-radius: 0 50px 50px 0;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: .75rem 1.5rem;
+            font-weight: 600;
+        }
+        .newsletter .btn-sub:hover { background: var(--accent-hover); }
+
+        .site-footer {
+            background: var(--primary);
+            color: rgba(255,255,255,.75);
+            font-size: .9rem;
+        }
+        .site-footer h6 { color: #fff; font-weight: 600; margin-bottom: 1rem; }
+        .site-footer a { color: rgba(255,255,255,.65); text-decoration: none; transition: color .2s; }
+        .site-footer a:hover { color: #fff; }
+        .site-footer .social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.1);
+            color: #fff;
+            margin-right: .5rem;
+            transition: background .2s;
+        }
+        .site-footer .social a:hover { background: var(--accent); }
+        .site-footer .footer-bottom { border-top: 1px solid rgba(255,255,255,.1); }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 999;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            font-size: 1.2rem;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: all .2s;
+        }
+        .back-to-top:hover { background: var(--accent); }
+        .back-to-top.visible { display: flex; }
+
+        @media (max-width: 767.98px) {
+            .hero { min-height: 80vh; text-align: center; }
+            .hero p { margin-left: auto; margin-right: auto; }
+            .hero .hero-stats .stat-item {
+                border-right: none;
+                padding-right: 0;
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+            .hero .hero-stats .stat-item:not(:last-child) { border-bottom: 1px solid rgba(255,255,255,.1); padding-bottom: 1rem; }
+            .hero-stats { flex-direction: column; }
+            .product-card .img-wrap { height: 200px; }
+            .category-card { height: 200px; }
+            .newsletter { border-radius: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-4" href="{% url 'home' %}">ShopMart</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" href="{% url 'home' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'product_list' %}">Shop</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Categories</a>
+                    <ul class="dropdown-menu">
+                        {% for cat in categories %}
+                            <li><a class="dropdown-item" href="{% url 'product_list_by_category' cat.slug %}">{{ cat.name }}</a></li>
+                        {% empty %}
+                            <li><span class="dropdown-item text-muted">No categories</span></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            </ul>
+            <ul class="navbar-nav align-items-lg-center">
+                <li class="nav-item">
+                    <a class="nav-link position-relative" href="{% url 'cart_detail' %}">
+                        <i class="bi bi-cart3"></i>
+                        <span class="badge rounded-pill bg-danger {% if cart_count == 0 %}d-none{% endif %}" style="font-size: .6rem; position: absolute; top: 4px; right: -4px;">{{ cart_count }}</span>
+                    </a>
+                </li>
+                {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="{% url 'wishlist' %}">
+                            <i class="bi bi-heart"></i>
+                            <span class="badge rounded-pill bg-danger {% if wishlist_count == 0 %}d-none{% endif %}" style="font-size: .6rem; position: absolute; top: 4px; right: -4px;">{{ wishlist_count }}</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'profile' %}">
+                            <i class="bi bi-person-circle"></i> {{ user.username }}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <form method="post" action="{% url 'logout' %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-light btn-sm ms-2">Logout</button>
+                        </form>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link position-relative" href="{% url 'login' %}?next={% url 'wishlist' %}">
+                            <i class="bi bi-heart"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'signup' %}">Sign Up</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% if messages %}
+    <div class="container mt-3">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">{{ message }}<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<section class="hero text-white">
+    <div class="container hero-content">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <span class="badge bg-accent bg-danger mb-3 px-3 py-2 rounded-pill">New Season Collection</span>
+                <h1>Discover Premium<br>Products You'll Love</h1>
+                <p class="mt-3 mb-4">Shop the latest trends with unbeatable prices. Fast shipping, easy returns, and exclusive deals waiting for you.</p>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{% url 'product_list' %}" class="btn btn-accent"><i class="bi bi-bag-check me-1"></i> Shop Now</a>
+                    <a href="#categories" class="btn btn-outline-light">Explore Categories</a>
+                </div>
+                <div class="hero-stats d-flex flex-wrap">
+                    <div class="stat-item"><div class="stat-number">10K+</div><div class="stat-label">Happy Customers</div></div>
+                    <div class="stat-item"><div class="stat-number">500+</div><div class="stat-label">Products</div></div>
+                    <div class="stat-item"><div class="stat-number">98%</div><div class="stat-label">Satisfaction</div></div>
+                </div>
+            </div>
+            <div class="col-lg-5 d-none d-lg-block text-center">
+                <i class="bi bi-bag-check-fill" style="font-size: 12rem; opacity: .1;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if featured_products %}
+<section class="py-5" id="featured">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="section-heading h3 mb-1">Featured Products</h2>
+                <p class="section-subtitle mb-0">Handpicked favorites just for you</p>
+            </div>
+            <a href="{% url 'product_list' %}?q=" class="btn btn-outline-dark rounded-pill btn-sm d-none d-sm-inline-block">View All <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="row g-3">
+            {% for product in featured_products %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="product-card card shadow-sm">
+                        <a href="{% url 'product_detail' product.category.slug product.slug %}" class="img-wrap">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                                <i class="bi bi-image text-secondary" style="font-size: 2.5rem;"></i>
+                            {% endif %}
+                            {% if product.discount_price %}
+                                <span class="badge bg-danger badge-pos">-{{ product.get_discounted_price|floatformat:0 }}%</span>
+                            {% endif %}
+                        </a>
+                        <div class="card-body">
+                            <a href="{% url 'product_detail' product.category.slug product.slug %}" class="text-decoration-none text-dark">
+                                <h6 class="card-title">{{ product.name }}</h6>
+                            </a>
+                            <p class="card-text text-muted small mb-2">{{ product.category.name }}</p>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <span class="price">${{ product.get_discounted_price|floatformat:2 }}</span>
+                                    {% if product.discount_price %}
+                                        <span class="price-old ms-1">${{ product.price|floatformat:2 }}</span>
+                                    {% endif %}
+                                </div>
+                                <button class="btn-add add-to-cart" data-product-id="{{ product.id }}">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-3 d-sm-none">
+            <a href="{% url 'product_list' %}" class="btn btn-outline-dark rounded-pill btn-sm">View All <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="py-5 bg-light" id="categories">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="section-heading h3">Shop by Category</h2>
+            <p class="section-subtitle mx-auto">Browse our curated collections</p>
+        </div>
+        {% if categories %}
+            <div class="row g-3">
+                {% for category in categories %}
+                    <div class="col-6 col-md-4 col-lg-4">
+                        <a href="{% url 'product_list_by_category' category.slug %}" class="category-card">
+                            {% if category.image %}
+                                <img src="{{ category.image.url }}" alt="{{ category.name }}">
+                            {% else %}
+                                <div class="bg-secondary d-flex align-items-center justify-content-center h-100">
+                                    <i class="bi bi-folder text-white" style="font-size: 3rem;"></i>
+                                </div>
+                            {% endif %}
+                            <div class="overlay"></div>
+                            <div class="cat-label">
+                                <h5>{{ category.name }}</h5>
+                                <small>{{ category.product_count }} product{{ category.product_count|pluralize }}</small>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-center text-muted">No categories available yet.</p>
+        {% endif %}
+    </div>
+</section>
+
+{% if new_arrivals %}
+<section class="py-5" id="new-arrivals">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="section-heading h3 mb-1">New Arrivals</h2>
+                <p class="section-subtitle mb-0">The latest products added to our store</p>
+            </div>
+            <a href="{% url 'product_list' %}" class="btn btn-outline-dark rounded-pill btn-sm d-none d-sm-inline-block">View All <i class="bi bi-arrow-right"></i></a>
+        </div>
+        <div class="row g-3">
+            {% for product in new_arrivals %}
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="product-card card shadow-sm">
+                        <a href="{% url 'product_detail' product.category.slug product.slug %}" class="img-wrap">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                                <i class="bi bi-image text-secondary" style="font-size: 2.5rem;"></i>
+                            {% endif %}
+                            <span class="badge bg-success badge-pos">New</span>
+                        </a>
+                        <div class="card-body">
+                            <a href="{% url 'product_detail' product.category.slug product.slug %}" class="text-decoration-none text-dark">
+                                <h6 class="card-title">{{ product.name }}</h6>
+                            </a>
+                            <p class="card-text text-muted small mb-2">{{ product.category.name }}</p>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="price">${{ product.get_discounted_price|floatformat:2 }}</span>
+                                <button class="btn-add add-to-cart" data-product-id="{{ product.id }}">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-3 d-sm-none">
+            <a href="{% url 'product_list' %}" class="btn btn-outline-dark rounded-pill btn-sm">View All <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<section class="py-5 bg-light" id="testimonials">
+    <div class="container">
+        <div class="text-center mb-4">
+            <h2 class="section-heading h3">What Our Customers Say</h2>
+            <p class="section-subtitle mx-auto">Real reviews from real people</p>
+        </div>
+        <div id="testimonialCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="row g-3 justify-content-center">
+                        <div class="col-md-6 col-lg-4">
+                            <div class="testimonial-card">
+                                <div class="stars mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+                                <p class="quote">"Absolutely love my purchase! The quality exceeded my expectations and shipping was incredibly fast. Will definitely shop here again."</p>
+                                <div class="d-flex align-items-center gap-2 mt-3">
+                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: 600;">SM</div>
+                                    <div><strong>Sarah M.</strong><br><small class="text-muted">Verified Buyer</small></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4 d-none d-md-block">
+                            <div class="testimonial-card">
+                                <div class="stars mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+                                <p class="quote">"Great selection of products at reasonable prices. The customer service team was very helpful when I had a question about sizing."</p>
+                                <div class="d-flex align-items-center gap-2 mt-3">
+                                    <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: 600;">JD</div>
+                                    <div><strong>James D.</strong><br><small class="text-muted">Verified Buyer</small></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 d-none d-lg-block">
+                            <div class="testimonial-card">
+                                <div class="stars mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i></div>
+                                <p class="quote">"Easy returns process and the product arrived in perfect condition. The packaging was impressive. Highly recommend this store."</p>
+                                <div class="d-flex align-items-center gap-2 mt-3">
+                                    <div class="bg-warning text-dark rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: 600;">AL</div>
+                                    <div><strong>Amy L.</strong><br><small class="text-muted">Verified Buyer</small></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="row g-3 justify-content-center">
+                        <div class="col-md-6 col-lg-4">
+                            <div class="testimonial-card">
+                                <div class="stars mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+                                <p class="quote">"Best online shopping experience I've had in a long time. The website is easy to navigate and checkout was seamless."</p>
+                                <div class="d-flex align-items-center gap-2 mt-3">
+                                    <div class="bg-info text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: 600;">MK</div>
+                                    <div><strong>Mike K.</strong><br><small class="text-muted">Verified Buyer</small></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4 d-none d-md-block">
+                            <div class="testimonial-card">
+                                <div class="stars mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+                                <p class="quote">"I've been a loyal customer for months and the quality has always been consistent. The loyalty rewards are a nice bonus too."</p>
+                                <div class="d-flex align-items-center gap-2 mt-3">
+                                    <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: 600;">ER</div>
+                                    <div><strong>Emily R.</strong><br><small class="text-muted">Verified Buyer</small></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 d-none d-lg-block">
+                            <div class="testimonial-card">
+                                <div class="stars mb-2"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
+                                <p class="quote">"The discount prices are incredible. I got premium products for a fraction of what I'd pay elsewhere. Fast delivery too!"</p>
+                                <div class="d-flex align-items-center gap-2 mt-3">
+                                    <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; font-weight: 600;">CT</div>
+                                    <div><strong>Carlos T.</strong><br><small class="text-muted">Verified Buyer</small></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-3">
+                <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide="prev" class="btn btn-sm btn-outline-secondary rounded-circle me-2"><i class="bi bi-chevron-left"></i></button>
+                <button type="button" data-bs-target="#testimonialCarousel" data-bs-slide="next" class="btn btn-sm btn-outline-secondary rounded-circle"><i class="bi bi-chevron-right"></i></button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="newsletter text-white">
+            <h3 class="fw-bold mb-2">Stay in the Loop</h3>
+            <p class="mb-4 opacity-75">Subscribe to get exclusive offers, new arrivals, and 10% off your first order.</p>
+            <form id="newsletterForm" method="post" action="#">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="email" class="form-control" placeholder="Enter your email" required>
+                    <button type="submit" class="btn-sub"><i class="bi bi-send me-1"></i> Subscribe</button>
+                </div>
+                <div id="newsletterMsg" class="mt-2 small"></div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<footer class="site-footer py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-3">
+                <h6>ShopMart</h6>
+                <p class="small opacity-75">Your one-stop destination for premium products. Quality, affordability, and exceptional service — that's our promise.</p>
+                <div class="social mt-2">
+                    <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+                    <a href="#" aria-label="Pinterest"><i class="bi bi-pinterest"></i></a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <h6>Quick Links</h6>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-1"><a href="{% url 'home' %}">Home</a></li>
+                    <li class="mb-1"><a href="{% url 'product_list' %}">Shop All</a></li>
+                    <li class="mb-1"><a href="#featured">Featured</a></li>
+                    <li class="mb-1"><a href="#new-arrivals">New Arrivals</a></li>
+                </ul>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <h6>Customer Service</h6>
+                <ul class="list-unstyled mb-0">
+                    <li class="mb-1"><a href="#">Help & FAQ</a></li>
+                    <li class="mb-1"><a href="#">Shipping Info</a></li>
+                    <li class="mb-1"><a href="#">Returns & Exchanges</a></li>
+                    <li class="mb-1"><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <h6>Contact</h6>
+                <ul class="list-unstyled mb-0 small">
+                    <li class="mb-1"><i class="bi bi-geo-alt me-1"></i> 123 Commerce St, Suite 100</li>
+                    <li class="mb-1"><i class="bi bi-envelope me-1"></i> support@shopmart.com</li>
+                    <li class="mb-1"><i class="bi bi-telephone me-1"></i> (555) 123-4567</li>
+                    <li><i class="bi bi-clock me-1"></i> Mon–Fri, 9am–6pm EST</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom pt-3 mt-4 text-center small opacity-75">
+            &copy; {% now "Y" %} ShopMart. All rights reserved.
+        </div>
+    </div>
+</footer>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top"><i class="bi bi-chevron-up"></i></button>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var backBtn = document.getElementById('backToTop');
+    window.addEventListener('scroll', function () {
+        backBtn.classList.toggle('visible', window.scrollY > 400);
+    });
+    backBtn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    document.querySelectorAll('.add-to-cart').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            var id = this.dataset.productId;
+            fetch('/cart/add/' + id + '/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': '{{ csrf_token }}', 'X-Requested-With': 'XMLHttpRequest' },
+            }).then(function (r) { return r.json(); }).then(function (data) {
+                var badge = document.querySelector('.navbar .badge');
+                if (badge) {
+                    badge.textContent = data.cart_count;
+                    badge.classList.toggle('d-none', data.cart_count === 0);
+                }
+                var alertHtml = '<div class="alert alert-success alert-dismissible fade show">' + data.message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
+                var msgDiv = document.querySelector('.container.mt-3');
+                if (msgDiv) msgDiv.insertAdjacentHTML('afterbegin', alertHtml);
+                setTimeout(function () { var al = document.querySelector('.alert'); if (al) al.remove(); }, 3000);
+            });
+        });
+    });
+
+    document.getElementById('newsletterForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var msg = document.getElementById('newsletterMsg');
+        msg.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> Thanks for subscribing!</span>';
+        this.querySelector('input').value = '';
+    });
+});
+</script>
+</body>
+</html>

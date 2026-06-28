@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<h3 class="mb-4">Checkout</h3>
+
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-3">Shipping Details</h5>
+                <form method="post">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="text-danger small mt-1">{{ field.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary w-100 mt-2">Place Order</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h5 class="card-title mb-3">Order Summary</h5>
+                {% for item in cart_items %}
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div class="d-flex gap-3">
+                            {% if item.product.image %}
+                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 60px; height: 60px; object-fit: cover;" class="rounded">
+                            {% else %}
+                                <div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-image text-white small"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h6 class="mb-0 small">{{ item.product.name }}</h6>
+                                <span class="text-muted small">Qty: {{ item.quantity }}</span>
+                            </div>
+                        </div>
+                        <span class="fw-bold">${{ item.total }}</span>
+                    </div>
+                {% endfor %}
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <span>Subtotal</span>
+                    <span class="fw-bold">${{ subtotal }}</span>
+                </div>
+                <div class="d-flex justify-content-between mt-1">
+                    <span class="text-muted">Shipping</span>
+                    <span class="text-muted">Free</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between fs-5">
+                    <span>Total</span>
+                    <span class="fw-bold">${{ subtotal }}</span>
+                </div>
+            </div>
+        </div>
+        <a href="{% url 'cart_detail' %}" class="btn btn-outline-secondary w-100 mt-3"><i class="bi bi-arrow-left"></i> Back to Cart</a>
+    </div>
+</div>
+{% endblock %}

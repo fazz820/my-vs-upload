@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'order_history' %}">My Orders</a></li>
+        <li class="breadcrumb-item active">{{ order.order_number }}</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="mb-1">Order #{{ order.order_number }}</h5>
+                        <p class="text-muted small mb-0">Placed on {{ order.created_at|date:'F d, Y' }}</p>
+                    </div>
+                    <div>
+                        {% if order.status == 'pending' %}
+                            <span class="badge bg-warning text-dark fs-6">Pending</span>
+                        {% elif order.status == 'processing' %}
+                            <span class="badge bg-info fs-6">Processing</span>
+                        {% elif order.status == 'shipped' %}
+                            <span class="badge bg-primary fs-6">Shipped</span>
+                        {% elif order.status == 'delivered' %}
+                            <span class="badge bg-success fs-6">Delivered</span>
+                        {% elif order.status == 'cancelled' %}
+                            <span class="badge bg-danger fs-6">Cancelled</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h6 class="text-muted mb-3">Order Status</h6>
+                    {% if order.status != 'cancelled' %}
+                        <div class="d-flex justify-content-between">
+                            {% with status_order='pending processing shipped delivered' %}
+                                {% for s in status_order.split %}
+                                    <div class="text-center {% if forloop.counter0 == 0 %}text-start{% elif forloop.last %}text-end{% endif %}" style="flex:1;">
+                                        <div class="rounded-circle d-inline-flex align-items-center justify-content-center mb-2
+                                            {% if order.status == s or order.status == 'processing' and s == 'pending' or order.status == 'shipped' and s in 'pending,processing' or order.status == 'delivered' and s in 'pending,processing,shipped' %}
+                                                bg-success text-white
+                                            {% elif s == order.status %}
+                                                bg-success text-white
+                                            {% else %}
+                                                bg-light text-muted border
+                                            {% endif %}"
+                                            style="width: 36px; height: 36px;">
+                                            {% if s == 'pending' %}
+                                                <i class="bi bi-receipt small"></i>
+                                            {% elif s == 'processing' %}
+                                                <i class="bi bi-gear small"></i>
+                                            {% elif s == 'shipped' %}
+                                                <i class="bi bi-truck small"></i>
+                                            {% elif s == 'delivered' %}
+                                                <i class="bi bi-check-lg small"></i>
+                                            {% endif %}
+                                        </div>
+                                        <div class="small text-muted">{{ s|title }}</div>
+                                    </div>
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-3">
+                            <i class="bi bi-x-circle text-danger fs-1"></i>
+                            <p class="text-muted mt-2">This order has been cancelled.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <h6 class="text-muted mb-3">Order Items</h6>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Qty</th>
+                                <th class="text-end">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items.all %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            {% if item.product and item.product.image %}
+                                                <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" style="width: 48px; height: 48px; object-fit: cover;" class="rounded">
+                                            {% else %}
+                                                <div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                                    <i class="bi bi-image text-white small"></i>
+                                                </div>
+                                            {% endif %}
+                                            <span>{{ item.product.name|default:'Deleted Product' }}</span>
+                                        </div>
+                                    </td>
+                                    <td>${{ item.price }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td class="text-end fw-bold">${{ item.get_total }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="3" class="text-end">Subtotal</td>
+                                <td class="text-end fw-bold">${{ order.total_amount }}</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end">Shipping</td>
+                                <td class="text-end text-muted">Free</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end fs-5">Total</td>
+                                <td class="text-end fs-5 fw-bold">${{ order.total_amount }}</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h6 class="text-muted mb-3">Shipping Address</h6>
+                <p class="mb-1">{{ order.shipping_address|linebreaksbr }}</p>
+                <hr>
+                <h6 class="text-muted mb-3">Phone</h6>
+                <p class="mb-0">{{ order.phone }}</p>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2">
+            <a href="{% url 'order_invoice' order.order_number %}" class="btn btn-outline-primary" target="_blank">
+                <i class="bi bi-download"></i> Download Invoice
+            </a>
+            <a href="{% url 'order_history' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Orders
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

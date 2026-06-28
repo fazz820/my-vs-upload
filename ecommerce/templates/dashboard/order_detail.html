@@ -1,0 +1,170 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block title %}Order {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+    <h1 class="h3">Order <span class="font-monospace">{{ order.order_number }}</span></h1>
+    <a href="{% url 'dashboard:order_list' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left"></i> Back to Orders
+    </a>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Order Items</h5>
+                <span class="text-muted small">{{ order.items.count }} item(s)</span>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Qty</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        {% if item.product and item.product.image %}
+                                            <img src="{{ item.product.image.url }}" alt="" style="width: 40px; height: 40px; object-fit: cover;" class="rounded">
+                                        {% else %}
+                                            <div class="bg-secondary bg-opacity-10 rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                <i class="bi bi-image text-muted small"></i>
+                                            </div>
+                                        {% endif %}
+                                        <div>
+                                            {% if item.product %}
+                                                {{ item.product.name }}
+                                            {% else %}
+                                                <span class="text-muted">Deleted product</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>${{ item.price|floatformat:2 }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td class="text-end">${{ item.get_total|floatformat:2 }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold">Total</td>
+                            <td class="text-end fw-bold">${{ order.get_total|floatformat:2 }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    {% if order.status == 'cancelled' %}
+                        <span class="badge bg-danger fs-6">Cancelled</span>
+                    {% elif order.status == 'delivered' %}
+                        <span class="badge bg-success fs-6">Delivered</span>
+                    {% elif order.status == 'shipped' %}
+                        <span class="badge bg-primary fs-6">Shipped</span>
+                    {% elif order.status == 'processing' %}
+                        <span class="badge bg-info text-dark fs-6">Processing</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark fs-6">Pending</span>
+                    {% endif %}
+                </div>
+
+                <form method="post" action="{% url 'dashboard:order_status_update' order.pk %}">
+                    {% csrf_token %}
+                    <div class="mb-2">
+                        <label for="statusSelect" class="form-label small">Update Status</label>
+                        <div class="input-group input-group-sm">
+                            <select name="status" id="statusSelect" class="form-select">
+                                {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Customer</h5>
+            </div>
+            <div class="card-body">
+                <dl class="mb-0 small">
+                    <dt>Name</dt>
+                    <dd>{{ order.user.get_full_name|default:order.user.username }}</dd>
+                    <dt>Email</dt>
+                    <dd><a href="mailto:{{ order.user.email }}" class="text-decoration-none">{{ order.user.email }}</a></dd>
+                    <dt>Username</dt>
+                    <dd>{{ order.user.username }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Shipping</h5>
+            </div>
+            <div class="card-body">
+                <dl class="mb-0 small">
+                    <dt>Phone</dt>
+                    <dd>{{ order.phone }}</dd>
+                    <dt>Address</dt>
+                    <dd>{{ order.shipping_address|linebreaksbr }}</dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Timeline</h5>
+            </div>
+            <div class="card-body">
+                <dl class="mb-0 small">
+                    <dt>Created</dt>
+                    <dd>{{ order.created_at|date:"M d, Y g:i a" }}</dd>
+                    {% if order.status == 'processing' %}
+                        <dt class="mt-2">Processing</dt>
+                        <dd class="text-muted">Status updated manually</dd>
+                    {% elif order.status == 'shipped' %}
+                        <dt class="mt-2">Shipped</dt>
+                        <dd class="text-muted">Status updated manually</dd>
+                    {% elif order.status == 'delivered' %}
+                        <dt class="mt-2">Delivered</dt>
+                        <dd class="text-muted">Status updated manually</dd>
+                    {% elif order.status == 'cancelled' %}
+                        <dt class="mt-2">Cancelled</dt>
+                        <dd class="text-muted">Status updated manually</dd>
+                    {% endif %}
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'dashboard/base_admin.html' %}
+
+{% block title %}Delete Category{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+    <h1 class="h3">Delete Category</h1>
+    <a href="{% url 'dashboard:category_list' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left"></i> Back to Categories
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-danger">
+            <div class="card-body text-center py-5">
+                <div class="mb-3">
+                    <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="card-title">Are you sure?</h5>
+                <p class="card-text text-muted">
+                    You are about to delete <strong>"{{ category.name }}"</strong>.
+                </p>
+
+                {% if category.image %}
+                    <div class="mb-3">
+                        <img src="{{ category.image.url }}" alt="{{ category.name }}" style="max-height: 80px;" class="rounded border">
+                    </div>
+                {% endif %}
+
+                <div class="alert alert-warning">
+                    <i class="bi bi-info-circle"></i>
+                    This category contains <strong>{{ category.product_count }}</strong> product{{ category.product_count|pluralize }}.
+                    {% if category.product_count > 0 %}
+                        All associated products will also be deleted.
+                    {% endif %}
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Yes, Delete Category
+                    </button>
+                    <a href="{% url 'dashboard:category_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

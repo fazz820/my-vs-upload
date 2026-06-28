@@ -1,0 +1,24 @@
+# Python
+>=3.11
+
+# Django & Core
+Django>=5.2,<6.0
+
+# Database
+sqlparse>=0.5
+
+# Production WSGI
+gunicorn>=23.0
+
+# Environment variables
+python-decouple>=3.8
+
+# Async support
+asgiref>=3.8
+
+# (Optional) Image processing
+# Pillow>=10.0
+
+# (Optional) Cache backend
+# redis>=5.0
+# django-redis>=5.4

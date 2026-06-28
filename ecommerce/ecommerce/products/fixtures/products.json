@@ -1,0 +1,218 @@
+[
+  {
+    "model": "products.product",
+    "pk": 1,
+    "fields": {
+      "category": 1,
+      "name": "Wireless Bluetooth Headphones",
+      "slug": "wireless-bluetooth-headphones",
+      "description": "Premium noise-cancelling wireless headphones with 30-hour battery life. Features deep bass, comfortable over-ear design, and built-in microphone for calls.",
+      "price": "149.99",
+      "discount_price": "99.99",
+      "stock": 50,
+      "image": "",
+      "is_featured": true,
+      "is_active": true,
+      "created_at": "2026-06-10T00:00:00Z",
+      "updated_at": "2026-06-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 2,
+    "fields": {
+      "category": 1,
+      "name": "Smartwatch Pro",
+      "slug": "smartwatch-pro",
+      "description": "Advanced smartwatch with heart rate monitoring, GPS tracking, sleep analysis, and 7-day battery life. Water resistant to 50 meters.",
+      "price": "249.99",
+      "discount_price": null,
+      "stock": 30,
+      "image": "",
+      "is_featured": true,
+      "is_active": true,
+      "created_at": "2026-06-09T00:00:00Z",
+      "updated_at": "2026-06-09T00:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 3,
+    "fields": {
+      "category": 1,
+      "name": "USB-C Hub 7-in-1",
+      "slug": "usb-c-hub-7-in-1",
+      "description": "Compact multi-port adapter with HDMI 4K, USB 3.0, SD/TF card reader, and 100W PD charging. Compatible with laptops and tablets.",
+      "price": "39.99",
+      "discount_price": "29.99",
+      "stock": 100,
+      "image": "",
+      "is_featured": true,
+      "is_active": true,
+      "created_at": "2026-06-08T00:00:00Z",
+      "updated_at": "2026-06-08T00:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 4,
+    "fields": {
+      "category": 2,
+      "name": "Classic Denim Jacket",
+      "slug": "classic-denim-jacket",
+      "description": "Timeless denim jacket made from premium cotton. Features button front closure, chest pockets, and a comfortable regular fit. Perfect for layering.",
+      "price": "89.99",
+      "discount_price": "69.99",
+      "stock": 40,
+      "image": "",
+      "is_featured": true,
+      "is_active": true,
+      "created_at": "2026-06-07T00:00:00Z",
+      "updated_at": "2026-06-07T00:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 5,
+    "fields": {
+      "category": 2,
+      "name": "Cotton Crew Neck T-Shirt",
+      "slug": "cotton-crew-neck-t-shirt",
+      "description": "Soft 100% organic cotton t-shirt with a relaxed fit. Pre-shrunk fabric, reinforced stitching, and a comfortable crew neckline.",
+      "price": "24.99",
+      "discount_price": null,
+      "stock": 200,
+      "image": "",
+      "is_featured": true,
+      "is_active": true,
+      "created_at": "2026-06-06T00:00:00Z",
+      "updated_at": "2026-06-06T00:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 6,
+    "fields": {
+      "category": 2,
+      "name": "Running Shoes Ultra",
+      "slug": "running-shoes-ultra",
+      "description": "Lightweight running shoes with responsive cushioning and breathable mesh upper. Features arch support and durable rubber outsole for road and trail.",
+      "price": "119.99",
+      "discount_price": "89.99",
+      "stock": 60,
+      "image": "",
+      "is_featured": true,
+      "is_active": true,
+      "created_at": "2026-06-05T00:00:00Z",
+      "updated_at": "2026-06-05T00:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 7,
+    "fields": {
+      "category": 3,
+      "name": "Stainless Steel Water Bottle",
+      "slug": "stainless-steel-water-bottle",
+      "description": "Double-wall vacuum insulated bottle keeps drinks cold 24h or hot 12h. BPA-free, leak-proof lid, fits most cupholders. 750ml capacity.",
+      "price": "34.99",
+      "discount_price": null,
+      "stock": 150,
+      "image": "",
+      "is_featured": true,
+      "is_active": true,
+      "created_at": "2026-06-04T00:00:00Z",
+      "updated_at": "2026-06-04T00:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 8,
+    "fields": {
+      "category": 4,
+      "name": "Yoga Mat Premium",
+      "slug": "yoga-mat-premium",
+      "description": "Non-slip exercise mat with alignment lines. Made from eco-friendly TPE material, 6mm thick for joint protection. Includes carrying strap.",
+      "price": "44.99",
+      "discount_price": "34.99",
+      "stock": 75,
+      "image": "",
+      "is_featured": true,
+      "is_active": true,
+      "created_at": "2026-06-03T00:00:00Z",
+      "updated_at": "2026-06-03T00:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 9,
+    "fields": {
+      "category": 5,
+      "name": "The Art of Clean Code",
+      "slug": "the-art-of-clean-code",
+      "description": "A practical guide to writing maintainable, readable, and efficient code. Covers best practices, design patterns, and real-world examples for modern developers.",
+      "price": "29.99",
+      "discount_price": null,
+      "stock": 90,
+      "image": "",
+      "is_featured": false,
+      "is_active": true,
+      "created_at": "2026-06-02T00:00:00Z",
+      "updated_at": "2026-06-02T00:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 10,
+    "fields": {
+      "category": 1,
+      "name": "Portable Bluetooth Speaker",
+      "slug": "portable-bluetooth-speaker",
+      "description": "Waterproof portable speaker with 360-degree sound. 12-hour battery, built-in mic, and USB-C charging. Perfect for outdoor adventures.",
+      "price": "59.99",
+      "discount_price": "44.99",
+      "stock": 45,
+      "image": "",
+      "is_featured": false,
+      "is_active": true,
+      "created_at": "2026-06-01T00:00:00Z",
+      "updated_at": "2026-06-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 11,
+    "fields": {
+      "category": 5,
+      "name": "Python Mastery: From Zero to Hero",
+      "slug": "python-mastery-from-zero-to-hero",
+      "description": "A comprehensive guide to Python programming covering fundamentals, OOP, web development, and data science. Includes hands-on projects and exercises.",
+      "price": "500.00",
+      "discount_price": "399.99",
+      "stock": 25,
+      "image": "",
+      "is_featured": true,
+      "is_active": true,
+      "created_at": "2026-06-15T00:00:00Z",
+      "updated_at": "2026-06-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "products.product",
+    "pk": 12,
+    "fields": {
+      "category": 5,
+      "name": "Data Structures & Algorithms Explained",
+      "slug": "data-structures-algorithms-explained",
+      "description": "Deep dive into essential data structures and algorithms with practical examples in Python. Covers trees, graphs, dynamic programming, and more.",
+      "price": "500.00",
+      "discount_price": null,
+      "stock": 20,
+      "image": "",
+      "is_featured": false,
+      "is_active": true,
+      "created_at": "2026-06-14T00:00:00Z",
+      "updated_at": "2026-06-14T00:00:00Z"
+    }
+  }
+]

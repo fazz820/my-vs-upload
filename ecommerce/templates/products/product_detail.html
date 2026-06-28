@@ -1,0 +1,337 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block extra_head %}
+<style>
+.product-main-image {
+    width: 100%;
+    height: 450px;
+    object-fit: contain;
+    transition: transform .3s ease;
+    cursor: crosshair;
+}
+.product-main-image.zoomed {
+    transform: scale(1.8);
+    cursor: zoom-out;
+}
+.thumb-img {
+    width: 100%;
+    height: 80px;
+    object-fit: cover;
+    cursor: pointer;
+    opacity: .6;
+    transition: opacity .2s, border-color .2s;
+}
+.thumb-img:hover {
+    opacity: .9;
+}
+.thumb-img.active {
+    opacity: 1;
+    border-color: #0d6efd !important;
+}
+.image-count-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0,0,0,.6);
+    color: #fff;
+    font-size: .75rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+.zoom-lens {
+    position: absolute;
+    border: 2px solid #0d6efd;
+    width: 150px;
+    height: 150px;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    display: none;
+    z-index: 10;
+    border-radius: 4px;
+}
+.zoom-result {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 20px);
+    width: 400px;
+    height: 400px;
+    border: 1px solid #dee2e6;
+    background-repeat: no-repeat;
+    display: none;
+    z-index: 20;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.15);
+}
+@media (max-width: 768px) {
+    .zoom-result { display: none !important; }
+    .zoom-lens { display: none !important; }
+    .product-main-image { cursor: default; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'product_list' %}">Products</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'product_list_by_category' product.category.slug %}">{{ product.category.name }}</a></li>
+        <li class="breadcrumb-item active">{{ product.name }}</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="position-relative mb-3" id="gallery-container">
+            {% if product.image %}
+                <div class="position-relative overflow-hidden rounded shadow-sm" style="background: #f8f9fa;">
+                    <img id="mainImage"
+                         src="{{ product.image.url }}"
+                         class="product-main-image"
+                         alt="{{ product.name }}"
+                         data-original="{{ product.image.url }}">
+                    <div class="zoom-lens" id="zoomLens"></div>
+                    <div class="zoom-result" id="zoomResult"></div>
+                </div>
+            {% else %}
+                <div class="bg-secondary rounded d-flex align-items-center justify-content-center shadow-sm" style="height: 450px;">
+                    <i class="bi bi-image text-white fs-1"></i>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <p class="text-muted mb-1">{{ product.category.name }}</p>
+        <h2>{{ product.name }}</h2>
+
+        <div class="my-3">
+            {% if product.discount_price %}
+                <span class="fs-3 fw-bold text-danger">${{ product.discount_price }}</span>
+                <span class="fs-5 text-muted text-decoration-line-through ms-2">${{ product.price }}</span>
+                <span class="badge bg-danger ms-2">Sale</span>
+            {% else %}
+                <span class="fs-3 fw-bold">${{ product.price }}</span>
+            {% endif %}
+        </div>
+
+        <p class="text-muted">{{ product.description }}</p>
+
+        <div class="mb-3">
+            {% if product.stock > 0 %}
+                <span class="badge bg-success">In Stock ({{ product.stock }} available)</span>
+            {% else %}
+                <span class="badge bg-danger">Out of Stock</span>
+            {% endif %}
+        </div>
+
+        {% if product.is_featured %}
+            <span class="badge bg-warning text-dark mb-3"><i class="bi bi-star-fill"></i> Featured</span>
+        {% endif %}
+
+        <div class="d-flex gap-2 mt-4">
+            {% if product.stock > 0 %}
+                <form method="post" action="{% url 'cart_add' product.id %}" class="add-to-cart-form">
+                    {% csrf_token %}
+                    <div class="input-group mb-3" style="width: 140px;">
+                        <button class="btn btn-outline-secondary" type="button" onclick="this.nextElementSibling.stepDown()">-</button>
+                        <input type="number" name="quantity" class="form-control text-center" value="1" min="1" max="{{ product.stock }}">
+                        <button class="btn btn-outline-secondary" type="button" onclick="this.previousElementSibling.stepUp()">+</button>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 add-to-cart-btn"><i class="bi bi-cart-plus"></i> Add to Cart</button>
+                </form>
+            {% endif %}
+            <button class="btn wishlist-btn {% if product.id in wishlist_ids %}btn-danger{% else %}btn-outline-danger{% endif %}" data-product-id="{{ product.id }}">
+                <i class="bi {% if product.id in wishlist_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+            </button>
+        </div>
+
+        <div class="mt-4 pt-3 border-top">
+            <p class="small text-muted mb-1"><strong>Category:</strong> {{ product.category.name }}</p>
+            <p class="small text-muted mb-0"><strong>Added:</strong> {{ product.created_at|date:'M d, Y' }}</p>
+        </div>
+    </div>
+</div>
+
+{% if related_products %}
+    <div class="mt-5">
+        <h4 class="mb-4">Related Products</h4>
+        <div class="row g-4">
+            {% for related in related_products %}
+                <div class="col-6 col-md-3">
+                    <div class="card h-100 shadow-sm">
+                        {% if related.image %}
+                            <img src="{{ related.image.url }}" class="card-img-top" alt="{{ related.name }}" style="height: 180px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-secondary d-flex align-items-center justify-content-center" style="height: 180px;">
+                                <i class="bi bi-image text-white fs-1"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title">{{ related.name }}</h6>
+                            <div class="mt-auto">
+                                {% if related.discount_price %}
+                                    <span class="fw-bold text-danger">${{ related.discount_price }}</span>
+                                    <span class="text-muted text-decoration-line-through small">${{ related.price }}</span>
+                                {% else %}
+                                    <span class="fw-bold">${{ related.price }}</span>
+                                {% endif %}
+                            </div>
+                            <a href="{% url 'product_detail' related.category.slug related.slug %}" class="stretched-link"></a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function setMainImage(thumb, url) {
+    const main = document.getElementById('mainImage');
+    if (!main) return;
+    main.src = url;
+    main.dataset.original = url;
+    document.querySelectorAll('.thumb-img').forEach(t => {
+        t.classList.remove('active');
+        t.style.borderColor = '#dee2e6';
+    });
+    thumb.classList.add('active');
+    thumb.style.borderColor = '#0d6efd';
+}
+
+(function() {
+    const main = document.getElementById('mainImage');
+    if (!main) return;
+
+    const container = document.getElementById('gallery-container');
+    const lens = document.getElementById('zoomLens');
+    const result = document.getElementById('zoomResult');
+
+    if (!container || !lens || !result) return;
+
+    const isMobile = window.innerWidth <= 768;
+
+    container.addEventListener('mouseenter', function() {
+        if (!isMobile && main.src && main.src !== window.location.href) {
+            const src = main.src;
+            result.style.backgroundImage = `url('${src}')`;
+        }
+    });
+
+    container.addEventListener('mousemove', function(e) {
+        if (isMobile || !main.src || main.src === window.location.href) return;
+
+        const rect = main.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const lensW = lens.offsetWidth;
+        const lensH = lens.offsetHeight;
+        const resultW = result.offsetWidth;
+        const resultH = result.offsetHeight;
+
+        let lensX = x - lensW / 2;
+        let lensY = y - lensH / 2;
+
+        if (lensX < 0) lensX = 0;
+        if (lensY < 0) lensY = 0;
+        if (lensX > rect.width - lensW) lensX = rect.width - lensW;
+        if (lensY > rect.height - lensH) lensY = rect.height - lensH;
+
+        lens.style.left = lensX + 'px';
+        lens.style.top = lensY + 'px';
+        lens.style.display = 'block';
+        result.style.display = 'block';
+
+        const ratioX = (main.naturalWidth || 800) / rect.width;
+        const ratioY = (main.naturalHeight || 800) / rect.height;
+
+        result.style.backgroundSize = `${rect.width * ratioX}px ${rect.height * ratioY}px`;
+        result.style.backgroundPosition = `-${lensX * ratioX}px -${lensY * ratioY}px`;
+    });
+
+    container.addEventListener('mouseleave', function() {
+        lens.style.display = 'none';
+        result.style.display = 'none';
+    });
+
+    main.addEventListener('click', function() {
+        this.classList.toggle('zoomed');
+    });
+})();
+
+document.querySelector('.wishlist-btn')?.addEventListener('click', function() {
+    const btn = this;
+    const productId = btn.dataset.productId;
+    const inWishlist = btn.classList.contains('btn-danger');
+    const url = inWishlist ? `/accounts/wishlist/remove/${productId}/` : `/accounts/wishlist/add/${productId}/`;
+    const formData = new FormData();
+    formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+
+    fetch(url, {
+        method: 'POST',
+        body: formData,
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (inWishlist) {
+            btn.classList.remove('btn-danger');
+            btn.classList.add('btn-outline-danger');
+            btn.querySelector('i').className = 'bi bi-heart';
+        } else {
+            btn.classList.remove('btn-outline-danger');
+            btn.classList.add('btn-danger');
+            btn.querySelector('i').className = 'bi bi-heart-fill';
+        }
+        const badge = document.querySelector('.wishlist-badge');
+        if (badge) {
+            badge.textContent = data.wishlist_count;
+            badge.classList.toggle('d-none', data.wishlist_count === 0);
+        }
+    });
+});
+
+document.querySelector('.add-to-cart-form')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = this;
+    const btn = form.querySelector('.add-to-cart-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Adding...';
+
+    const formData = new FormData(form);
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            const badge = document.querySelector('.cart-badge');
+            if (badge) {
+                badge.textContent = data.cart_count;
+                badge.classList.remove('d-none');
+            }
+            btn.innerHTML = '<i class="bi bi-check-lg"></i> Added!';
+            setTimeout(() => {
+                btn.innerHTML = '<i class="bi bi-cart-plus"></i> Add to Cart';
+                btn.disabled = false;
+            }, 1500);
+        }
+    })
+    .catch(() => {
+        btn.innerHTML = '<i class="bi bi-cart-plus"></i> Add to Cart';
+        btn.disabled = false;
+    });
+});
+</script>
+{% endblock %}
